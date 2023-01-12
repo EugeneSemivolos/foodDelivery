@@ -153,15 +153,23 @@ window.addEventListener('DOMContentLoaded', () => {
       this.parent.append(element);
     }
   }
-  new MenuCard(
-    "img/tabs/vegy.jpg",
-    "vegy",
-    "Меню \"Фитнес\"",
-    "Меню \"Фитнес\" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!",
-    4,
-    ".menu .container"
-  ).render();
 
+  const getResource = async (url, data) => {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url} status: ${res.status}`);
+    }
+
+    return await res.json(); 
+  };
+
+  getResource('http://localhost:3000/menu')
+  .then(data => {
+    data.forEach(({img, altimg, title, descr, price}) => {
+      new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    });
+  })
 
   //Forms
 
@@ -174,10 +182,23 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   forms.forEach((form) => {
-    postData(form);
+    bindPostData(form);
   })
 
-  function postData(form) {
+
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: data
+    });
+
+    return await res.json(); 
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -191,24 +212,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(form);
 
-      const object = {};
-      formData.forEach(function(value, key){
-        object[key] = value;
-      });
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-      fetch('server.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(object)
-      }).then(data => {
+      postData('http://localhost:3000/requests', json)
+      .then(data => {
         console.log(data);
         showThanksModal(message.success);
         statusMessage.remove();
-      }).catch(() => {
+      })
+      .catch(() => {
         showThanksModal(message.failure);
-      }).finally(() => {
+      })
+      .finally(() => {
         form.reset();
       });
     });
@@ -236,4 +251,8 @@ window.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }, 3000);
   }
+
+  fetch('http://localhost:3000/menu')
+    .then(data => data.json())
+    .then(res => console.log(res));
 });
