@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   //timer
 
-  const deadline = '2022-08-31';
+  const deadline = '2023-04-01';
 
   function setClock(selector, endTime) {
     const timer = document.querySelector(selector);
