@@ -1,7 +1,12 @@
+export const delay = {
+  firstAppearance: 3000,
+  thanksModal: 4000,
+} 
+
 const modalTriggers = document.querySelectorAll("[data-modal]");
 const modal = document.querySelector(".modal");
 const modalCloseBtn = document.querySelector("[data-close]");
-const modalTimerID = setTimeout(openModal, 3000);
+const modalTimerID = setTimeout(openModal, delay.firstAppearance);
 
 function openModal() {
   modal.classList.add("show");
@@ -17,10 +22,8 @@ function closeModal() {
 }
 
 function showModalByScroll() {
-  if (
-    window.pageYOffset + document.documentElement.clientHeight >=
-    document.documentElement.scrollHeight - 1
-  ) {
+  const { clientHeight, scrollHeight } = document.documentElement;
+  if (window.pageYOffset + clientHeight >= scrollHeight - 1) {
     openModal();
     window.removeEventListener("scroll", showModalByScroll);
   }
@@ -60,5 +63,5 @@ export function showThanksModal(message) {
     prevModalDialog.classList.add('show');
     prevModalDialog.classList.remove('hide');
     closeModal();
-  }, 3000);
+  }, delay.thanksModal);
 }

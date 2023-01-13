@@ -5,7 +5,19 @@ import { initCalculator } from './modules/calculator.js';
 import { MenuCard } from './modules/menuCard.js';
 import { initModal, showThanksModal } from './modules/modal.js';
 import { getData, postData } from './modules/requests.js';
-import { LINKS, MESSAGE } from './config.js';
+
+const message = {
+  loading: 'img/form/spinner.svg',
+  success: 'Всё прошло отлично!',
+  failure: 'Что-то пошло не так...'
+};
+
+const links = {
+  json_server: {
+    menu: 'http://localhost:3000/menu',
+    requests: 'http://localhost:3000/requests',
+  }
+}
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -15,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initCalculator();
   initModal();
 
-  getData(LINKS.json_server.menu)
+  getData(links.json_server.menu)
   .then(data => {
     data.forEach(({img, altimg, title, descr, price}) => {
       new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
@@ -32,7 +44,7 @@ window.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       
       const statusMessage = document.createElement('img');
-      statusMessage.src = MESSAGE.loading;
+      statusMessage.src = message.loading;
       statusMessage.style.cssText = `
         display: block;
         margin: 0 auto;
@@ -40,13 +52,13 @@ window.addEventListener('DOMContentLoaded', () => {
       form.insertAdjacentElement('afterend', statusMessage);
   
       const jsonData = formatDataToJSON(form);
-      postData(LINKS.json_server.requests, jsonData)
+      postData(links.json_server.requests, jsonData)
         .then(data => {
-          showThanksModal(MESSAGE.success);
+          showThanksModal(message.success);
           statusMessage.remove();
         })
         .catch(() => {
-          showThanksModal(MESSAGE.failure);
+          showThanksModal(message.failure);
         })
         .finally(() => {
           form.reset();

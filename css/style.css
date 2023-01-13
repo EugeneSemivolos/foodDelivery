@@ -27,3 +27,16 @@
     opacity: .5;
     transition: opacity .6s ease;
 }
+
+.offer__slider-inner {
+    display: flex;
+    transition: 0.5s all;
+}
+
+.offer__slider {
+    position: relative;
+}
+
+.offer__slider-wrapper {
+    overflow: hidden;
+}
