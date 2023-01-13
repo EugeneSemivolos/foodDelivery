@@ -1,28 +1,31 @@
 const slides = document.querySelectorAll('.offer__slide'),
-slider = document.querySelector('.offer__slider'),
-prev = document.querySelector('.offer__slider-prev'),
-next = document.querySelector('.offer__slider-next'),
-total = document.querySelector('#total'),
-current = document.querySelector('#current'),
-slidesWrapper = document.querySelector('.offer__slider-wrapper'),
-slidesField = document.querySelector('.offer__slider-inner'),
-width = window.getComputedStyle(slidesWrapper).width;
-
+      slider = document.querySelector('.offer__slider'),
+      prev = document.querySelector('.offer__slider-prev'),
+      next = document.querySelector('.offer__slider-next'),
+      total = document.querySelector('#total'),
+      current = document.querySelector('#current'),
+      slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+      slidesField = document.querySelector('.offer__slider-inner'),
+      width = window.getComputedStyle(slidesWrapper).width,
+      dots = [];
 let slideIndex = 1;
 let offset = 0;
 
 export function initSlider() {
-  total.textContent = formatNumber(slides.length);
-  current.textContent = formatNumber(slideIndex);
+  total.textContent = formatNumberTo00(slides.length);
+  current.textContent = formatNumberTo00(slideIndex);
 
   slidesField.style.width = 100 * slides.length + '%';
   
   slides.forEach(slide => {
     slide.style.width = width;
   });
+  createIndicators();
+  addEventListeners();
+}
 
-  const indicators = document.createElement('ol'),
-        dots = [];
+function createIndicators() {
+  const indicators = document.createElement('ol');
   indicators.classList.add('carousel-indicators');
   slider.append(indicators);
 
@@ -36,73 +39,67 @@ export function initSlider() {
     indicators.append(dot);
     dots.push(dot);
   }
+}
 
+function addEventListeners() {
   next.addEventListener('click', () => {
-    if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+    if (offset == getPureNumber(width) * (slides.length - 1)) {
       offset = 0;
     } else {
-      offset += +width.slice(0, width.length - 2);
+      offset += getPureNumber(width);
     }
-
-    slidesField.style.transform = `translateX(-${offset}px)`;
-
     if (slideIndex == slides.length) {
       slideIndex = 1;
     } else {
       slideIndex++;
     }
-    
-    current.textContent = formatNumber(slideIndex);
-
-    dots.forEach(dot => dot.style.opacity = '.5');
-    dots[slideIndex - 1].style.opacity = 1;
+    showSlide(offset, slideIndex);
   });
 
   prev.addEventListener('click', () => {
     if (offset == 0) {
-      offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+      offset = getPureNumber(width) * (slides.length - 1);
     } else {
-      offset -= +width.slice(0, width.length - 2);
+      offset -= getPureNumber(width);
     }
-
-    slidesField.style.transform = `translateX(-${offset}px)`;
-
     if (slideIndex == 1) {
       slideIndex = slides.length;
     } else {
       slideIndex--;
     }
-
-    current.textContent = formatNumber(slideIndex);
-
-    dots.forEach(dot => dot.style.opacity = '.5');
-    dots[slideIndex - 1].style.opacity = 1;
+    showSlide(offset, slideIndex);
   });
 
   dots.forEach(dot => {
     dot.addEventListener('click', (e) => {
       const slideTo = e.target.getAttribute('data-slide-to');
       slideIndex = slideTo;
-      offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+      offset = getPureNumber(width) * (slideTo - 1);
 
-      slidesField.style.transform = `translateX(-${offset}px)`;
-
-      if (slides.length < 10) {
-        current.textContent = `0${slideIndex}`;
-      } else {
-        current.textContent = slideIndex;
-      }
-
-      dots.forEach(dot => dot.style.opacity = '.5');
-      dots[slideIndex - 1].style.opacity = 1;
+      showSlide(offset, slideIndex);
     });
   });
 }
 
-function formatNumber(number) {
+function showSlide(offset, slideIndex) {
+  slidesField.style.transform = `translateX(-${offset}px)`;
+  current.textContent = formatNumberTo00(slideIndex);
+  dots.forEach(dot => dot.style.opacity = '.5');
+  dots[slideIndex - 1].style.opacity = 1;
+}
+
+function formatNumberTo00(number) {
   if (number < 10) {
     return `0${number}`;
   } else {
     return number;
   }
+}
+
+function getPureNumber(str) {
+  let res = '';
+  for (const symbol of str) {
+    if (symbol.match(/\d/g)) res += symbol;
+  }
+  return +res;
 }
