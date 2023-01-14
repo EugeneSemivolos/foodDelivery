@@ -5,4 +5,5 @@ This is site for food Delivery company ([link](https://eugenesemivolos.github.io
 
 ## How to start server
 To start server, download this repo. Then install all node packages and type in console
+
 ``` npx json-server db.json```
